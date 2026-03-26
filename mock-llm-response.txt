@@ -1,0 +1,13 @@
+<file_op>
+<action>update</action>
+<path>AI Prompt Builder 2/my-app/src/renderer/src/components/workspace/WorkspaceMain.jsx</path>
+<content><search>
+import React, { useState, useEffect, useMemo } from 'react';
+import { Copy, Download, CheckCircle, FileText, Settings, Code, Zap, Loader2, AlertTriangle } from 'lucide-react';
+import { isBinaryPath } from '../utils/fileTreeUtils';
+</search><replace>
+import React, { useState, useEffect, useMemo } from 'react';
+import { Copy, Download, CheckCircle, FileText, Settings, Code, Zap, Loader2, AlertTriangle } from 'lucide-react';
+import { isBinaryPath } from '../../utils/fileTreeUtils';
+</replace></content>
+</file_op>
