@@ -1,4 +1,3 @@
-// AI Prompt Builder 2/my-app/src/renderer/src/components/workspace/WorkspaceMain.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import { Copy, Download, CheckCircle, FileText, Settings, Code, Zap, Loader2, AlertTriangle } from 'lucide-react';
 import { isTextFile } from '../../utils/fileTreeUtils';
