@@ -1,0 +1,29 @@
+{
+  "presets": [
+    {
+      "id": "695ddcce-b6d4-427d-bd3d-d5ee13c6e514",
+      "name": "Default",
+      "visibilityMap": {
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/node_modules": "hidden",
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/package-lock.json": "outline"
+      },
+      "expandedFolders": [
+        "8db032b2-9c3a-4c91-9903-a5158974611d",
+        "e20908bc-0bbd-4ce4-b178-4218f7cfca2a",
+        "10e26f49-cc14-43a0-b225-765521ac9401"
+      ]
+    }
+  ],
+  "activePresetId": "695ddcce-b6d4-427d-bd3d-d5ee13c6e514",
+  "prompts": [
+    {
+      "id": "f90e2bf0-5a8a-46ef-9e57-da83b86be6f4",
+      "name": "Main Prompt",
+      "content": "<p></p>"
+    }
+  ],
+  "activePromptId": "f90e2bf0-5a8a-46ef-9e57-da83b86be6f4",
+  "selectedModel": "Google Gemini",
+  "selectedProtocol": "srp",
+  "protocolUid": "4c7cbaac"
+}

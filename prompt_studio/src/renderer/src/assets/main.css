@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Dark Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #374151; /* Tailwind gray-700 */
+  border-radius: 5px;
+  border: 2px solid #111827; /* Tailwind gray-900 (matches sidebar bg) */
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563; /* Tailwind gray-600 */
+}
+
+/* Electron Window Dragging Utilities */
+.drag-region {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Custom Flash Animations */
+@keyframes flash-add {
+  0% { background-color: rgba(34, 197, 94, 0.25); color: #86efac; }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-change {
+  0% { background-color: rgba(59, 130, 246, 0.25); color: #93c5fd; }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-delete {
+  0% { background-color: rgba(239, 68, 68, 0.25); color: #fca5a5; text-decoration: line-through; }
+  100% { background-color: transparent; color: inherit; text-decoration: line-through; }
+}
+
+@keyframes flash-rename {
+  0% { background-color: rgba(234, 179, 8, 0.25); color: #fde047; }
+  100% { background-color: transparent; }
+}
+
+@keyframes flash-cascade {
+  0% { background-color: rgba(168, 85, 247, 0.4); color: #e9d5ff; } /* Purple cascade flair */
+  100% { background-color: transparent; color: inherit; }
+}
+
+.animate-flash-add {
+  animation: flash-add 0.5s ease-out forwards;
+}
+
+.animate-flash-change {
+  animation: flash-change 0.5s ease-out forwards;
+}
+
+.animate-flash-delete {
+  animation: flash-delete 0.5s ease-out forwards;
+}
+
+.animate-flash-rename {
+  animation: flash-rename 0.5s ease-out forwards;
+}
+
+.animate-flash-cascade {
+  animation: flash-cascade 0.6s ease-out both; /* 'both' ensures delay holds the initial color */
+}
+
+
+/* Quill Dark Theme Overrides */
+.quill {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.ql-toolbar.ql-snow {
+  border-color: #1f2937 !important; /* gray-800 */
+  background-color: #030712 !important; /* gray-950 */
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  padding: 12px !important;
+}
+.ql-container.ql-snow {
+  flex: 1;
+  min-height: 0;
+  border-color: #1f2937 !important;
+  background-color: #030712 !important;
+  color: #e5e7eb !important; /* gray-200 */
+  font-size: 0.875rem !important; /* text-sm */
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  font-family: inherit !important;
+}
+.ql-editor {
+  min-height: 150px;
+  height: 100%;
+  overflow-y: auto;
+  line-height: 1.625;
+}
+.ql-snow .ql-stroke {
+  stroke: #9ca3af !important; /* gray-400 */
+}
+.ql-snow .ql-fill, .ql-snow .ql-stroke.ql-fill {
+  fill: #9ca3af !important;
+}
+.ql-snow .ql-picker {
+  color: #9ca3af !important;
+}
+.ql-snow .ql-picker-options {
+  background-color: #111827 !important; /* gray-900 */
+  border-color: #374151 !important; /* gray-700 */
+}
+.ql-editor.ql-blank::before {
+  color: #4b5563 !important; /* gray-600 */
+  font-style: normal !important;
+}
+
+/* Dark mode overrides for inline code and code blocks */
+.ql-snow .ql-editor code,
+.ql-snow .ql-editor pre,
+.ql-editor code,
+.ql-editor pre {
+  background-color: #111827 !important; /* gray-900 */
+  border: 1px solid #374151 !important; /* gray-700 */
+  border-radius: 0.375rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+}
+
+.ql-snow .ql-editor code,
+.ql-editor code {
+  color: #93c5fd !important; /* blue-300 */
+  padding: 0.125rem 0.375rem;
+  font-size: 0.85em;
+}
+
+.ql-snow .ql-editor pre,
+.ql-editor pre {
+  color: #e5e7eb !important; /* gray-200 */
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+
+/* Restore native lists exclusively in the Read-Only Preview */
+.ql-editor:not([contenteditable="true"]) ul,
+.ql-editor:not([contenteditable="true"]) ol {
+  padding-left: 1.5em !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+}
+
+.ql-editor:not([contenteditable="true"]) ul > li {
+  list-style-type: disc !important;
+  display: list-item !important;
+  margin-bottom: 0.25em !important;
+}
+
+.ql-editor:not([contenteditable="true"]) ol > li {
+  list-style-type: decimal !important;
+  display: list-item !important;
+  margin-bottom: 0.25em !important;
+}
+
+/* Add support for nested bullets in the preview */
+.ql-editor:not([contenteditable="true"]) ul ul > li {
+  list-style-type: circle !important;
+}
+.ql-editor:not([contenteditable="true"]) ul ul ul > li {
+  list-style-type: square !important;
+}

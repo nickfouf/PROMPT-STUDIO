@@ -1,0 +1,43 @@
+{
+  "presets": [
+    {
+      "id": "9a9fd05c-0024-42fc-8614-37f81c6c63a7",
+      "name": "Default",
+      "visibilityMap": {
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/package-lock.json": "outline",
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/package-lock.json": "hidden",
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio": "full",
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/test": "hidden",
+        "C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/resources": "outline"
+      },
+      "expandedFolders": [
+        "81028024-857c-4e04-927e-50bc99889c6c",
+        "bd7ca579-79db-43fe-a85b-f4659d30b70a",
+        "71c43e22-1f40-4275-9b09-aa9d9cde2a16",
+        "46ef81c6-edd4-4394-9ee3-3fad35d7c783",
+        "93a50e47-d435-4cd4-8326-b0f28fe7fa7b",
+        "51caf1fa-4779-4630-8e8b-1e0b423c099d",
+        "535e0b1b-4a66-48bc-abeb-87a2b937b331",
+        "f3306a06-d95a-4190-b071-fc6ad485ab2e",
+        "7d8d9dd1-aa19-4f40-a0d2-cf9f0a15fb98",
+        "185f4667-9c93-4814-922f-ee8c2e259b8f",
+        "6cd1943d-011c-4eb7-b1a0-1a4f09ce9c73",
+        "170005ec-4454-4503-9d76-d39a2b7189ed",
+        "fbe11e93-08e4-46b3-96f8-ac6107021288",
+        "864dd377-cdb9-4cd1-ab9d-4d7aaf8584cb"
+      ]
+    }
+  ],
+  "activePresetId": "9a9fd05c-0024-42fc-8614-37f81c6c63a7",
+  "prompts": [
+    {
+      "id": "d07f3af2-77ae-4ea1-9ede-636737ea61a0",
+      "name": "Main Prompt",
+      "content": "<p>I&nbsp;have&nbsp;a&nbsp;project&nbsp;with&nbsp;config.json:</p><pre data-language=\"plain\">\n{\n\t\t\t&quot;id&quot;: &quot;1774714658280&quot;,\n\t\t\t&quot;name&quot;: &quot;Prompt Studio&quot;,\n\t\t\t&quot;nodes&quot;: [\n\t\t\t\t{\n\t\t\t\t\t&quot;id&quot;: &quot;6cd1943d-011c-4eb7-b1a0-1a4f09ce9c73&quot;,\n\t\t\t\t\t&quot;name&quot;: &quot;Prompt Studio&quot;,\n\t\t\t\t\t&quot;path&quot;: &quot;C:\\\\Users\\\\Kallikratidas\\\\WebstormProjects\\\\Prompt Studio&quot;,\n\t\t\t\t\t&quot;type&quot;: &quot;folder&quot;,\n\t\t\t\t\t&quot;children&quot;: []\n\t\t\t\t}\n\t\t\t],\n\t\t\t&quot;presets&quot;: [\n\t\t\t\t{\n\t\t\t\t\t&quot;id&quot;: &quot;9a9fd05c-0024-42fc-8614-37f81c6c63a7&quot;,\n\t\t\t\t\t&quot;name&quot;: &quot;Default&quot;,\n\t\t\t\t\t&quot;visibilityMap&quot;: {\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/node_modules&quot;: &quot;hidden&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/node_modules&quot;: &quot;hidden&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/package-lock.json&quot;: &quot;hidden&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/prompt_studio/package-lock.json&quot;: &quot;hidden&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/.git&quot;: &quot;hidden&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio&quot;: &quot;full&quot;,\n\t\t\t\t\t\t&quot;C:/Users/Kallikratidas/WebstormProjects/Prompt Studio/test&quot;: &quot;hidden&quot;\n\t\t\t\t\t},\n\t\t\t\t\t&quot;expandedFolders&quot;: [\n\t\t\t\t\t\t&quot;81028024-857c-4e04-927e-50bc99889c6c&quot;,\n\t\t\t\t\t\t&quot;bd7ca579-79db-43fe-a85b-f4659d30b70a&quot;,\n\t\t\t\t\t\t&quot;71c43e22-1f40-4275-9b09-aa9d9cde2a16&quot;,\n\t\t\t\t\t\t&quot;46ef81c6-edd4-4394-9ee3-3fad35d7c783&quot;,\n\t\t\t\t\t\t&quot;93a50e47-d435-4cd4-8326-b0f28fe7fa7b&quot;,\n\t\t\t\t\t\t&quot;51caf1fa-4779-4630-8e8b-1e0b423c099d&quot;,\n\t\t\t\t\t\t&quot;535e0b1b-4a66-48bc-abeb-87a2b937b331&quot;,\n\t\t\t\t\t\t&quot;f3306a06-d95a-4190-b071-fc6ad485ab2e&quot;,\n\t\t\t\t\t\t&quot;7d8d9dd1-aa19-4f40-a0d2-cf9f0a15fb98&quot;,\n\t\t\t\t\t\t&quot;185f4667-9c93-4814-922f-ee8c2e259b8f&quot;,\n\t\t\t\t\t\t&quot;6cd1943d-011c-4eb7-b1a0-1a4f09ce9c73&quot;,\n\t\t\t\t\t\t&quot;170005ec-4454-4503-9d76-d39a2b7189ed&quot;\n\t\t\t\t\t]\n\t\t\t\t}\n\t\t\t],\n\t\t\t&quot;activePresetId&quot;: &quot;9a9fd05c-0024-42fc-8614-37f81c6c63a7&quot;,\n\t\t\t&quot;prompts&quot;: [\n\t\t\t\t{\n\t\t\t\t\t&quot;id&quot;: &quot;d07f3af2-77ae-4ea1-9ede-636737ea61a0&quot;,\n\t\t\t\t\t&quot;name&quot;: &quot;Main Prompt&quot;,\n\t\t\t\t\t&quot;content&quot;: &quot;&lt;p&gt;I&amp;nbsp;have&amp;nbsp;a&amp;nbsp;project&amp;nbsp;with&amp;nbsp;config.json:&lt;/p&gt;&lt;p&gt;&lt;/p&gt;&lt;p&gt;App&amp;nbsp;is&lt;/p&gt;&quot;\n\t\t\t\t}\n\t\t\t],\n\t\t\t&quot;activePromptId&quot;: &quot;d07f3af2-77ae-4ea1-9ede-636737ea61a0&quot;,\n\t\t\t&quot;selectedModel&quot;: &quot;Google Gemini&quot;,\n\t\t\t&quot;selectedProtocol&quot;: &quot;none&quot;,\n\t\t\t&quot;protocolUid&quot;: &quot;0ebf2ee3&quot;,\n\t\t\t&quot;updaterParsed&quot;: null,\n\t\t\t&quot;updaterBlockStatus&quot;: {},\n\t\t\t&quot;isCountingTokens&quot;: false,\n\t\t\t&quot;tokenError&quot;: null,\n\t\t\t&quot;tokenCount&quot;: 108350,\n\t\t\t&quot;isApproximateTokens&quot;: true\n\t\t}\n</pre><p></p><p>App&nbsp;says&nbsp;its&nbsp;scanning&nbsp;26000&nbsp;items:</p><p>Initial&nbsp;scan&nbsp;complete.&nbsp;Watched&nbsp;26145&nbsp;items.</p><p></p><p></p><p>Why?&nbsp;I&nbsp;want&nbsp;the&nbsp;app&nbsp;to&nbsp;just&nbsp;check&nbsp;if&nbsp;the&nbsp;files/folders&nbsp;that&nbsp;have&nbsp;altered&nbsp;visibility&nbsp;state&nbsp;and&nbsp;are&nbsp;saved&nbsp;in&nbsp;the&nbsp;config&nbsp;exist&nbsp;now&nbsp;that&nbsp;user&nbsp;opens&nbsp;project&nbsp;again.&nbsp;Why&nbsp;26000&nbsp;items?&nbsp;This&nbsp;is&nbsp;how&nbsp;many&nbsp;files&nbsp;totally&nbsp;the&nbsp;project&nbsp;may&nbsp;have&nbsp;but&nbsp;that&#39;s&nbsp;not&nbsp;what&nbsp;I&nbsp;want&nbsp;the&nbsp;app&nbsp;to&nbsp;check.&nbsp;And&nbsp;if&nbsp;it&nbsp;is&nbsp;because&nbsp;of&nbsp;the&nbsp;watch&nbsp;mechanism,&nbsp;why&nbsp;don&#39;t&nbsp;we&nbsp;just&nbsp;watch&nbsp;the&nbsp;outer&nbsp;root&nbsp;folders&nbsp;of&nbsp;a&nbsp;project?&nbsp;isn&#39;t&nbsp;this&nbsp;what&nbsp;we&nbsp;do?</p>"
+    }
+  ],
+  "activePromptId": "d07f3af2-77ae-4ea1-9ede-636737ea61a0",
+  "selectedModel": "Google Gemini",
+  "selectedProtocol": "none",
+  "protocolUid": "0ebf2ee3"
+}

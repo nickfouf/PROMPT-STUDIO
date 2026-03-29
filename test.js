@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // ==========================================
 // 1. HELPER: FUZZY SEARCH ENGINE
@@ -17,22 +18,18 @@ function findBlockMatch(fileContent, searchBlock) {
     const strategies = [
         {
             name: 'Perfect Match',
-            // Exactly as provided (post-normalization)
             regex: new RegExp(escaped, 'g')
         },
         {
             name: 'Ignore Line Breaks',
-            // Treat explicit newlines as any combination of whitespace/newlines
             regex: new RegExp(escaped.replace(/\\n/g, '\\s+'), 'g')
         },
         {
             name: 'Ignore NBSP vs Space',
-            // Same as above, but allow normal spaces to match non-breaking spaces (\u00A0)
             regex: new RegExp(escaped.replace(/\\n/g, '\\s+').replace(/ /g, '[ \\u00A0]+'), 'g')
         },
         {
             name: 'Ignore All Space Mistakes',
-            // Remove all whitespace from the search string, escape characters, and insert \s* between every single character
             regex: new RegExp(cleanSearch.replace(/\s+/g, '').split('').map(escapeRegExp).join('\\s*'), 'g')
         }
     ];
@@ -51,18 +48,15 @@ function findBlockMatch(fileContent, searchBlock) {
                 strategy: strategy.name
             };
         } else if (matches.length > 1) {
-            // CRITICAL: Fail safely with a specific message if > 1 match is found
             throw new Error(`Update failed: Multiple matches (${matches.length}) found using strategy "${strategy.name}". The search block must be specific enough to yield exactly 1 match.`);
         }
-        // If 0 matches, let the loop continue to the next fallback strategy
     }
 
-    // If all strategies fail
     return { success: false, error: 'Search block not found using any strategy (Exact, Line Breaks, NBSP, or Ignore Spaces).' };
 }
 
 // ==========================================
-// 2. THE PARSER (Upgraded for Multi-Tag, CDATA & Attribute Support)
+// 2. PARSERS (Files & Commands)
 // ==========================================
 function parseFileOperations(llmText) {
     const operations = [];
@@ -73,21 +67,17 @@ function parseFileOperations(llmText) {
         const attributeString = match[1] || '';
         const innerContent = match[2] || '';
 
-        // Helper: Extracts fields and safely cleans CDATA wrappers
         const getFieldFromContent = (content, fieldName) => {
             const tagRegex = new RegExp(`<${fieldName}>([\\s\\S]*?)<\\/${fieldName}>`);
             const tagMatch = content.match(tagRegex);
 
             if (tagMatch) {
                 let extractedText = tagMatch[1];
-
-                // Much safer CDATA match (doesn't require ^ and $)
                 const cdataRegex = /<!\[CDATA\[([\s\S]*?)]]>/;
                 const cdataMatch = extractedText.match(cdataRegex);
 
                 if (cdataMatch) {
                     let inner = cdataMatch[1];
-                    // Strip exactly one leading/trailing newline commonly added by LLM formatting
                     return inner.replace(/^\r?\n/, '').replace(/\r?\n$/, '');
                 }
                 return extractedText.trim();
@@ -95,7 +85,6 @@ function parseFileOperations(llmText) {
             return null;
         };
 
-        // NEW FORMAT: Check for action tags directly nested in <file_op> (e.g., <update>...</update>)
         const actionTagsRegex = /<(update|create|overwrite|delete|move)>([\s\S]*?)<\/\1>/g;
         let hasActionTags = false;
         let actionMatch;
@@ -107,7 +96,6 @@ function parseFileOperations(llmText) {
 
             const op = { action };
 
-            // Try child tag first, then fallback to attribute string if needed
             op.path = getFieldFromContent(actionContent, 'path');
             if (!op.path) {
                 const pathAttrRegex = /path="([^"]+)"/;
@@ -131,7 +119,6 @@ function parseFileOperations(llmText) {
             operations.push(op);
         }
 
-        // ORIGINAL FORMAT FALLBACK: Check for action as an attribute or an <action> child tag
         if (!hasActionTags) {
             let action = getFieldFromContent(innerContent, 'action');
             if (!action) {
@@ -143,7 +130,6 @@ function parseFileOperations(llmText) {
             if (action) {
                 const op = { action };
 
-                // FIXED: Try child tag first, then extract from <file_op ... path="...">
                 op.path = getFieldFromContent(innerContent, 'path');
                 if (!op.path) {
                     const pathAttrRegex = /path="([^"]+)"/;
@@ -154,7 +140,6 @@ function parseFileOperations(llmText) {
                 if (action === 'create' || action === 'overwrite') {
                     op.content = getFieldFromContent(innerContent, 'content') || '';
                 } else if (action === 'delete') {
-                    // Delete only needs a path
                 } else if (action === 'move') {
                     op.source = getFieldFromContent(innerContent, 'source');
                     op.destination = getFieldFromContent(innerContent, 'destination');
@@ -171,8 +156,22 @@ function parseFileOperations(llmText) {
     return operations;
 }
 
+function parseCmdOperations(llmText) {
+    const operations = [];
+    const cmdOpRegex = /<cmd_op>([\s\S]*?)<\/cmd_op>/g;
+
+    let match;
+    while ((match = cmdOpRegex.exec(llmText)) !== null) {
+        const command = match[1].replace(/^\r?\n/, '').replace(/\r?\n$/, '').trim();
+        if (command) {
+            operations.push({ action: 'execute', command });
+        }
+    }
+    return operations;
+}
+
 // ==========================================
-// 3. THE EXECUTION ENGINE (With Fallback)
+// 3. EXECUTION ENGINES
 // ==========================================
 function applyFileOperations(projectRoot, operations) {
     const results = { successful: [], failed: [] };
@@ -209,24 +208,20 @@ function applyFileOperations(projectRoot, operations) {
                 const fileContent = fs.readFileSync(fullPath, 'utf8').replace(/\r\n/g, '\n');
                 const cleanReplace = op.replace.replace(/\r\n/g, '\n');
 
-                // RANGE UPDATE LOGIC
                 if (op.searchStart && op.searchEnd) {
                     const startResult = findBlockMatch(fileContent, op.searchStart);
                     if (!startResult.success) throw new Error(`search_start failed: ${startResult.error}`);
 
-                    // Search for the end block *only* in the text that comes after the start block
                     const remainingContent = fileContent.substring(startResult.endIndex);
                     const endResult = findBlockMatch(remainingContent, op.searchEnd);
                     if (!endResult.success) throw new Error(`search_end failed: ${endResult.error}`);
 
                     const prefix = fileContent.substring(0, startResult.startIndex);
-                    // Add the remaining content's offset back in
                     const suffix = remainingContent.substring(endResult.endIndex);
 
                     fs.writeFileSync(fullPath, prefix + cleanReplace + suffix, 'utf8');
                     results.successful.push(`Updated (Range Mode): ${op.path}`);
                 }
-                // STANDARD UPDATE LOGIC
                 else if (op.search) {
                     const searchResult = findBlockMatch(fileContent, op.search);
 
@@ -250,10 +245,33 @@ function applyFileOperations(projectRoot, operations) {
     return results;
 }
 
+function applyCmdOperations(projectRoot, operations) {
+    const results = { successful: [], failed: [] };
+
+    for (const op of operations) {
+        try {
+            const output = execSync(op.command, {
+                cwd: projectRoot,
+                encoding: 'utf8',
+                stdio: 'pipe'
+            });
+            results.successful.push(`Executed: ${op.command}`);
+        } catch (error) {
+            results.failed.push({
+                operation: op.action,
+                command: op.command,
+                error: error.message,
+                stderr: error.stderr ? error.stderr.trim() : 'No stderr output'
+            });
+        }
+    }
+    return results;
+}
+
 // ==========================================
 // 4. THE TEST SANDBOX
 // ==========================================
-const TEST_DIR = path.join(__dirname, '../');
+const TEST_DIR = path.join(__dirname, './');
 
 try {
     const mockPath = path.join(__dirname, 'mock-llm-response.txt');
@@ -261,15 +279,24 @@ try {
         const mockLLMResponse = fs.readFileSync(mockPath, 'utf8');
 
         console.log("1. Parsing LLM Output...");
-        const parsedOps = parseFileOperations(mockLLMResponse);
-        console.log(`-> Found ${parsedOps.length} operations to execute.\n`);
+        const parsedFileOps = parseFileOperations(mockLLMResponse);
+        const parsedCmdOps = parseCmdOperations(mockLLMResponse);
+        console.log(`-> Found ${parsedFileOps.length} file operations and ${parsedCmdOps.length} command operations.\n`);
 
-        console.log("2. Applying Operations to disk...");
-        const executionResults = applyFileOperations(TEST_DIR, parsedOps);
+        console.log("2. Applying File Operations to disk...");
+        const fileExecutionResults = applyFileOperations(TEST_DIR, parsedFileOps);
 
-        console.log("\n--- RESULTS ---");
-        executionResults.successful.forEach(msg => console.log(`✅ ${msg}`));
-        executionResults.failed.forEach(f => console.log(`❌ [${f.operation}] ${f.path}: ${f.error}`));
+        console.log("3. Executing Commands...");
+        const cmdExecutionResults = applyCmdOperations(TEST_DIR, parsedCmdOps);
+
+        console.log("\n--- FILE RESULTS ---");
+        fileExecutionResults.successful.forEach(msg => console.log(`✅ ${msg}`));
+        fileExecutionResults.failed.forEach(f => console.log(`❌ [${f.operation}] ${f.path}: ${f.error}`));
+
+        console.log("\n--- COMMAND RESULTS ---");
+        cmdExecutionResults.successful.forEach(msg => console.log(`✅ ${msg}`));
+        cmdExecutionResults.failed.forEach(f => console.log(`❌ [${f.operation}] ${f.command}\n   Error: ${f.error}\n   Stderr: ${f.stderr}`));
+
     } else {
         console.log("Mock file not found. Place your LLM response text in mock-llm-response.txt to test.");
     }

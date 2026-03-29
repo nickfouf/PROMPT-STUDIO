@@ -1,0 +1,121 @@
+srp,9d4b2f1e
+
+\<markdown uid="9d4b2f1e"\>
+I understand what's happening. You are encountering two compounding issues that cause the "Project files" and "Tokens" to hang infinitely:
+
+1.  **`isCountingTokens` getting stuck in the save file**: Because the UI automatically syncs the `projects` state to `config.json` every 500ms, if the app happens to save right while tokens are being counted, it saves `"isCountingTokens": true`. When you reload the app, it boots up with the token spinner instantly turned on, and gets permanently stuck there if the workspace isn't fully ready yet.
+2.  **Infinite Hanging in the Backend (Tokens & Chokidar)**:
+      - `chokidar`'s `.close()` method is notoriously known to hang indefinitely on Windows if there are pending active file events. If you add a folder, it tries to close the old watcher and gets entirely stuck, leaving the folder permanently displaying the `_isScanning` spinner.
+      - The token counting library (`@lenml/tokenizer-gemini`) internally tries to fetch the 3MB `tokenizer.json` model from Hugging Face on its first run. If your network blocks it or is slow, the native Node `fetch` has no default timeout, permanently hanging the token counting process.
+
+I have applied a patch to strip ephemeral loading flags from the configuration file on save, and wrapped both the Tokenizer fetch logic and the Chokidar closing functions in `Promise.race` timeouts to guarantee the UI is never permanently blocked by the backend.
+\</markdown uid="9d4b2f1e"\>
+
+\<file\_op uid="9d4b2f1e" action="update" path="src/renderer/src/App.jsx"\>
+\<search uid="9d4b2f1e"\>
+      const projectsToSave = projects.map(p =\> ({
+        ...p,
+        // ONLY save the root nodes to config.json to keep it tiny.
+        // The full tree is rebuilt dynamically on load via buildTree.
+        nodes: p.nodes.map(n =\> ({ id: n.id, name: n.name, path: n.path, type: n.type, children:[] }))
+      }));
+\</search uid="9d4b2f1e"\>
+\<replace uid="9d4b2f1e"\>
+      const projectsToSave = projects.map(p =\> ({
+        ...p,
+        // ONLY save the root nodes to config.json to keep it tiny.
+        // The full tree is rebuilt dynamically on load via buildTree.
+        nodes: p.nodes.map(n =\> ({ id: n.id, name: n.name, path: n.path, type: n.type, children:[] })),
+        isCountingTokens: false,
+        tokenError: null
+      }));
+\</replace uid="9d4b2f1e"\>
+\</file\_op uid="9d4b2f1e"\>
+
+\<file\_op uid="9d4b2f1e" action="update" path="src/main/index.js"\>
+\<search uid="9d4b2f1e"\>
+    if (currentWatcher) {
+      await currentWatcher.close();
+      currentWatcher = null;
+    }
+\</search uid="9d4b2f1e"\>
+\<replace uid="9d4b2f1e"\>
+    if (currentWatcher) {
+      try {
+        await Promise.race([
+          currentWatcher.close(),
+          new Promise(r =\> setTimeout(r, 1500))
+        ]);
+      } catch (e) {}
+      currentWatcher = null;
+    }
+\</replace uid="9d4b2f1e"\>
+\</file\_op uid="9d4b2f1e"\>
+
+\<file\_op uid="9d4b2f1e" action="update" path="src/main/index.js"\>
+\<search\_start uid="9d4b2f1e"\>
+  // --- Non-blocking, 100% Offline Token Counter ---
+  ipcMain.handle('tokens:count', async (\_, { text, model }) =\> {
+    try {
+      if (\!text || text.trim() === '') return { count: 0, isApproximate: false };
+
+      // 1. OPENAI (100% Accurate)
+\</search\_start uid="9d4b2f1e"\>
+\<search\_end uid="9d4b2f1e"\>
+        return { count, isApproximate: true };
+      }
+
+      return { count: 0, isApproximate: false };
+    } catch (err) {
+      console.error("Token counting error:", err);
+      return { error: err.message };
+    }
+  });
+\</search\_end uid="9d4b2f1e"\>
+\<replace uid="9d4b2f1e"\>
+  // --- Non-blocking, 100% Offline Token Counter ---
+  ipcMain.handle('tokens:count', async (\_, { text, model }) =\> {
+    try {
+      if (\!text || text.trim() === '') return { count: 0, isApproximate: false };
+
+      const countTask = async () =\> {
+        // 1. OPENAI (100% Accurate)
+        if (model === 'OpenAI') {
+          const enc = getEncoding("o200k\_base");
+          const count = enc.encode(text).length;
+          return { count, isApproximate: false };
+        }
+
+        // 2. GOOGLE GEMINI (Highly Accurate Offline Approximation)
+        if (model === 'Google Gemini') {
+          if (\!geminiTokenizer) {
+            geminiTokenizer = await geminiFromPreTrained();
+          }
+          const encoded = geminiTokenizer.encode(text);
+          const count = encoded.input\_ids ? encoded.input\_ids.length : encoded.length;
+          return { count, isApproximate: true };
+        }
+
+        // 3. ANTHROPIC CLAUDE (Highly Accurate Offline Approximation)
+        if (model === 'Anthropic Claude') {
+          if (\!claudeTokenizer) {
+            claudeTokenizer = await claudeFromPreTrained();
+          }
+          const encoded = claudeTokenizer.encode(text);
+          const count = encoded.input\_ids ? encoded.input\_ids.length : encoded.length;
+          return { count, isApproximate: true };
+        }
+
+        return { count: 0, isApproximate: false };
+      };
+
+      const timeoutTask = new Promise((\_, reject) =\> setTimeout(() =\> reject(new Error('Token counting timed out (Network Hang)')), 8000));
+      return await Promise.race([countTask(), timeoutTask]);
+
+    } catch (err) {
+      console.error("Token counting error:", err);
+      return { error: err.message };
+    }
+  });
+\</replace uid="9d4b2f1e"\>
+\</file\_op uid="9d4b2f1e"\>
